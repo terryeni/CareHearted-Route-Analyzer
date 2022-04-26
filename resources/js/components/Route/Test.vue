@@ -24,7 +24,7 @@
                             <input id="tripDestination_2" class="form-control" type="text" name="tripDestination[]"/>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Route</button>
+                    <button type="submit" class="btn btn-primary" @click="getDirections">Route</button>
                 <div id="map" style="min-height: 500px;">
                 </div>
 
@@ -84,7 +84,33 @@ export default {
                 }).catch(function (error){
                     console.log(error);
                 });
-        }
+        },
+        getDirections: function (){
+            axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/-84.518641,39.134270;-84.512023,39.102779?'
+                + 'geometries=geojson&access_token=' + this.access_token + '&steps=true')
+                .then((response) => {
+                    console.log(response);
+                    this.location_data = response.data.routes[0].legs[0].steps[0].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[1].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[2].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[3].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[4].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[5].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[6].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[7].maneuver.instruction;
+                    this.location_data += "\n";
+                    this.location_data += response.data.routes[0].legs[0].steps[8].maneuver.instruction;
+                }).catch(function (error){
+                console.log(error);
+            });
+        },
     }
 }
 </script>
