@@ -17,14 +17,16 @@
                     <div class="row my-3">
                         <div class="col-6">
                             <label for="tripDestination" class="form-label">Destination</label>
-                            <input id="tripDestination" class="form-control" type="text" name="tripDestination[]"/>
+                            <input id="tripDestination" class="form-control" type="text" v-model="destination1"/>
                         </div>
                         <div class="col-6">
                             <label for="tripDestination_2" class="form-label">Destination 2</label>
-                            <input id="tripDestination_2" class="form-control" type="text" name="tripDestination[]"/>
+                            <input id="tripDestination_2" class="form-control" type="text" v-model="destination2"/>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" @click="getDirections">Route</button>
+                    <button type="submit" class="btn btn-primary" @click="calculateRoute">
+                        Route
+                    </button>
                 <div id="map" style="min-height: 500px;">
                 </div>
 
@@ -49,7 +51,9 @@ export default {
             start: this.start_point,
             longitude: -1.7775,
             latitude: 52.4159,
-            location_data:'',
+            location_data: '',
+            destination1: '',
+            destination2: '',
         }
     },
     mounted(){
@@ -85,11 +89,20 @@ export default {
                     console.log(error);
                 });
         },
-        getDirections: function (){
-            axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/-84.518641,39.134270;-84.512023,39.102779?'
+        calculateRoute: async function (){
+            let cord = [];
+            let dest1 = await this.getCoordinates(this.destination1);
+            let dest2 = await this.getCoordinates(this.destination2);
+            cord.push(await this.getCoordinates(this.start),dest1,dest2);
+            let destinations = cord.join(";");
+
+            this.getDirections(destinations);
+        },
+        getDirections: function (coordinates){
+            // axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/-84.518641,39.134270;-84.512023,39.102779?'
+            axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/'+ coordinates+'?'
                 + 'geometries=geojson&access_token=' + this.access_token + '&steps=true')
                 .then((response) => {
-                    console.log(response);
                     this.location_data = response.data.routes[0].legs[0].steps[0].maneuver.instruction;
                     this.location_data += "\n";
                     this.location_data += response.data.routes[0].legs[0].steps[1].maneuver.instruction;
@@ -110,6 +123,23 @@ export default {
                 }).catch(function (error){
                 console.log(error);
             });
+        },
+        getCoordinates: async function (search){
+            let cord;
+                await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/'
+                    + search + '.json?access_token=' + this.access_token)
+                        .then((response) => {
+                            console.log(response);
+                            let longitude = response.data.features[0].geometry.coordinates[0];
+                            console.log('longitude' + longitude);
+                            let latitude = response.data.features[0].geometry.coordinates[1];
+                            console.log('latidtude' + latitude);
+                            cord = longitude + ',' + latitude;
+                        })
+                        .catch(function (error){
+                            console.log(error);
+                        });
+                return cord;
         },
     }
 }
