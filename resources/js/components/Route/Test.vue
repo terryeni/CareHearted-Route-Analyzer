@@ -11,7 +11,7 @@
                             <button class="btn btn-dark" @click="setPosition">Set Position</button>
                         </div>
                         <div id="startPostcode" class="form-text">
-                            This is the postcode you will plan your route from
+                            This is the postcode we will plan your route from
                         </div>
                     </div>
                     <div class="row my-3">
@@ -30,11 +30,9 @@
                 <div id="map" style="min-height: 500px;">
                 </div>
 
-                <div class="card h-100 mt-3" v-if="location_data">
-                    <div class="card-header">Route Options</div>
-                    <div class="card-body">
-                        <pre>{{ location_data }}</pre>
-                    </div>
+                <div class="card h-100 mt-3" v-if="direction_data">
+                    <directions v-bind:direction_data="direction_data">
+                    </directions>
                 </div>
           </div>
         </div>
@@ -43,8 +41,10 @@
 
 <script>
 import mapboxgl from 'mapbox-gl';
+import Directions from "./Directions";
 export default {
     name: "Test",
+    components: {Directions},
     props:['start_point','access_token'],
     data() {
         return {
@@ -52,6 +52,7 @@ export default {
             longitude: -1.7775,
             latitude: 52.4159,
             location_data: '',
+            direction_data: '',
             destination1: '',
             destination2: '',
         }
@@ -83,7 +84,6 @@ export default {
                     this.longitude = response.data.features[0].geometry.coordinates[0];
                     this.latitude = response.data.features[0].geometry.coordinates[1];
                     this.location_data = response;
-
                     this.loadmap();
                 }).catch(function (error){
                     console.log(error);
@@ -97,29 +97,22 @@ export default {
             let destinations = cord.join(";");
 
             this.getDirections(destinations);
+            this.setPosition();
         },
         getDirections: function (coordinates){
             // axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/-84.518641,39.134270;-84.512023,39.102779?'
             axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/'+ coordinates+'?'
                 + 'geometries=geojson&access_token=' + this.access_token + '&steps=true')
                 .then((response) => {
-                    this.location_data = response.data.routes[0].legs[0].steps[0].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[1].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[2].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[3].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[4].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[5].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[6].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[7].maneuver.instruction;
-                    this.location_data += "\n";
-                    this.location_data += response.data.routes[0].legs[0].steps[8].maneuver.instruction;
+
+                    let steps = response.data.routes[0].legs[0].steps;
+
+                    steps.map(function (step,i){
+                        this.direction_data += step.maneuver.instruction;
+                        this.direction_data += "\n";
+
+                    },this)
+
                 }).catch(function (error){
                 console.log(error);
             });
@@ -129,12 +122,11 @@ export default {
                 await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/'
                     + search + '.json?access_token=' + this.access_token)
                         .then((response) => {
-                            console.log(response);
+
                             let longitude = response.data.features[0].geometry.coordinates[0];
-                            console.log('longitude' + longitude);
                             let latitude = response.data.features[0].geometry.coordinates[1];
-                            console.log('latidtude' + latitude);
                             cord = longitude + ',' + latitude;
+
                         })
                         .catch(function (error){
                             console.log(error);
