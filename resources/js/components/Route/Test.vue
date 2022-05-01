@@ -15,21 +15,44 @@
                         </div>
                     </div>
                     <div class="row my-3">
-                        <div class="col-6">
-                            <label for="tripDestination" class="form-label">Destination</label>
-                            <input id="tripDestination" class="form-control" type="text" v-model="destination1"/>
-                        </div>
-                        <div class="col-6">
-                            <label for="tripDestination_2" class="form-label">Destination 2</label>
-                            <input id="tripDestination_2" class="form-control" type="text" v-model="destination2"/>
+                        <label for="destinationsList" class="form-label">Destinations</label>
+                        <div class="col align-content-center">
+                            <div id="destinationsList" class="form-text">
+                                Click to add more destination inputs
+                            </div>
+                            <button v-show="destinations.length < 10" @click="addInput" type="button"
+                                    id="add-destination-button" class="btn btn-outline-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg>
+                                <span class="visually-hidden">Button</span>
+                            </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" @click="calculateRoute">
-                        Test
-                    </button>
-                    <button type="submit" class="btn btn-primary" @click="loadDestinations">
-                        Route
-                    </button>
+                    <div class="row">
+                        <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
+                            <div class="col-8 pt-1">
+                                <label for="tripDestination" class="form-label">Destination {{ n }}</label>
+                                <input id="tripDestination" class="form-control" type="text" v-model="destination1"/>
+                            </div>
+                            <div class="col-4 mt-auto">
+                                <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                    <span class="visually-hidden">Button</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container my-3">
+                        <button type="submit" class="btn btn-primary" @click="calculateRoute">
+                            Test
+                        </button>
+                        <button type="submit" class="btn btn-primary" @click="loadDestinations">
+                            Route
+                        </button>
+                    </div>
                 <div id="map" style="min-height: 500px;">
                 </div>
 
@@ -59,7 +82,7 @@ export default {
             location_data: '',
             destination1: '',
             destination2: '',
-            destinations: [],
+            destinations: [{}],
         }
     },
     mounted(){
@@ -132,6 +155,12 @@ export default {
         },
         loadDestinations: function (){
             this.destinations.push({location: this.destination1},{location: this.destination2});
+        },
+        addInput: function () {
+            this.destinations.push({location:''});
+        },
+        removeInput(index){
+            this.destinations.splice(index, 1);
         }
     }
 }
