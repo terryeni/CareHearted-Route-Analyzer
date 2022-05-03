@@ -1,9 +1,10 @@
 <template>
     <div class="container">
-        <div v-for="destination in dests">
+        <div v-for="destination in destinations">
             <div class="card-header">Route Option Data</div>
-            <div class="card-body">
-                <pre>{{ destination.route }}</pre>
+            <div class="card-body" v-if="destination.location">
+                <h3>Directions to {{ destination.location}}</h3>
+                <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
             </div>
         </div>
     </div>
@@ -12,26 +13,26 @@
 <script>
 export default {
     name: "Directions",
-    props: ['start', 'destinations'],
+    props: ['start', 'initial_destinations'],
     data(){
         return {
-            dests: this.destinations
+            destinations: this.initial_destinations
         }
     },
     mounted(){
-        this.loadDirections();
+
     },
     methods: {
         loadDirections: async function (){
-            for (let i = 0; i < this.dests.length; i++){
+            for (let i = 0; i < this.destinations.length; i++){
                 let coordinates = [await this.$parent.getCoordinates(this.start)];
-                let dest = await this.$parent.getCoordinates(this.dests[i].location)
+                let dest = await this.$parent.getCoordinates(this.destinations[i].location)
 
-                this.dests[i].coordinates = dest;
-                coordinates.push(this.dests[i].coordinates);
+                this.destinations[i].coordinates = dest;
+                coordinates.push(this.destinations[i].coordinates);
 
                 let map = coordinates.join(";");
-                this.dests[i].route = await this.$parent.getDirections(map);
+                this.destinations[i].route = await this.$parent.getDirections(map);
                 this.$forceUpdate();
             }
         }

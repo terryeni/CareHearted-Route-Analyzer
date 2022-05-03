@@ -33,7 +33,7 @@
                         <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
                             <div class="col-8 pt-1">
                                 <label for="tripDestination" class="form-label">Destination {{ n }}</label>
-                                <input id="tripDestination" class="form-control" type="text" v-model="destination1"/>
+                                <input id="tripDestination" class="form-control" type="text" v-model="destination.location"/>
                             </div>
                             <div class="col-4 mt-auto">
                                 <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
@@ -56,9 +56,10 @@
                 <div id="map" style="min-height: 500px;">
                 </div>
 
-                <div class="card h-100 mt-3" v-if="destinations.length > 0">
+                <div class="card h-100 mt-3" v-if="destinations[0].location">
                     <directions
-                        v-bind:destinations="destinations"
+                        ref="directions"
+                        v-bind:initial_destinations="destinations"
                         v-bind:start="start"
                     ></directions>
                 </div>
@@ -82,7 +83,7 @@ export default {
             location_data: '',
             destination1: '',
             destination2: '',
-            destinations: [{}],
+            destinations: [{location:''}],
         }
     },
     mounted(){
@@ -154,7 +155,7 @@ export default {
                 return cord;
         },
         loadDestinations: function (){
-            this.destinations.push({location: this.destination1},{location: this.destination2});
+            this.$refs.directions.loadDirections();
         },
         addInput: function () {
             this.destinations.push({location:''});
