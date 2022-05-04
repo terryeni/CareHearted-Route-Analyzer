@@ -22,6 +22,13 @@ window.Vue = require('vue').default;
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('mapbox-test', require('./components/Route/Test.vue').default);
 
+Vue.filter('secondsToMinutes', function (time) {
+    return (time/ 60).toFixed(2);
+})
+
+Vue.filter('metresToMiles', function (distance) {
+    return (distance * 0.00062137).toFixed(2);
+})
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
