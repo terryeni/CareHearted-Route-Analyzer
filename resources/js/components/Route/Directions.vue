@@ -1,9 +1,21 @@
 <template>
-    <div class="container">
+    <div class="row">
         <div v-for="destination in destinations">
             <div class="card-header">Route Option Data</div>
             <div class="card-body" v-if="destination.location">
-                <h3>Directions to {{ destination.location}}</h3>
+                <div class="form-label">
+                    <p> Trip:
+                        <small> {{ destination.start_point }} </small> to
+                        <small> {{ destination.location}} </small>
+                    </p>
+                </div>
+                <div class="form-text">
+                    <p>
+                        Duration: <small>{{ destination.duration }} <b>seconds</b> </small>
+                        <br/>
+                        Distance: <small>{{ destination.distance }} <b>meters</b></small>
+                    </p>
+                </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
             </div>
         </div>
@@ -25,14 +37,24 @@ export default {
     methods: {
         loadDirections: async function (){
             for (let i = 0; i < this.destinations.length; i++){
-                let coordinates = [await this.$parent.getCoordinates(this.start)];
+                this.destinations[i].start_point = this.start;
+                let coordinates = [await this.$parent.getCoordinates(this.destinations[i].start_point)];
                 let dest = await this.$parent.getCoordinates(this.destinations[i].location)
 
                 this.destinations[i].coordinates = dest;
                 coordinates.push(this.destinations[i].coordinates);
+                let coordinatesList = coordinates.join(";");
 
-                let map = coordinates.join(";");
-                this.destinations[i].route = await this.$parent.getDirections(map);
+                if (!this.destinations[i].route){
+                    let route = await this.$parent.getDirections(coordinatesList);
+
+                    this.destinations[i].route = route.directions;
+                    this.destinations[i].duration = route.duration;
+                    this.destinations[i].distance = route.distance;
+                }
+                else {
+                    console.log("skipping getDirections");
+                }
                 this.$forceUpdate();
             }
         }

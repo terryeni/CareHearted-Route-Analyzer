@@ -122,16 +122,23 @@ export default {
             this.destinations.push({location:'B92 0DL'},{location:'B92 8PS'});
         },
         getDirections: async function (coordinates){
-            let route = "";
+            let route = {directions:''};
             // axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/-84.518641,39.134270;-84.512023,39.102779?'
             await axios.get('https://api.mapbox.com/directions/v5/mapbox/driving/'+ coordinates+'?'
                 + 'geometries=geojson&access_token=' + this.access_token + '&steps=true')
                 .then((response) => {
+                    // this.location_data = response.data;
+                    // response.data.routes[0].distance returns distance in meters
+                    // response.data.routes[0].duration returns travel time in seconds
                     let steps = response.data.routes[0].legs[0].steps;
+
                     steps.map(function (step,i){
-                        route += step.maneuver.instruction;
-                        route += "\n";
+                        route.directions += step.maneuver.instruction;
+                        route.directions += "\n";
                     },[this,route])
+
+                    route.duration = response.data.routes[0].duration;
+                    route.distance = response.data.routes[0].distance;
                 }).catch(function (error){
                 console.log(error);
             });
