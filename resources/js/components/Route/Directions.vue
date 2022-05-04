@@ -37,7 +37,11 @@ export default {
     methods: {
         loadDirections: async function (){
             for (let i = 0; i < this.destinations.length; i++){
-                this.destinations[i].start_point = this.start;
+                if (i === 0)
+                    this.destinations[i].start_point = this.start;
+                else
+                    this.destinations[i].start_point = this.destinations[i-1].location;
+
                 let coordinates = [await this.$parent.getCoordinates(this.destinations[i].start_point)];
                 let dest = await this.$parent.getCoordinates(this.destinations[i].location)
 
