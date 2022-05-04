@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div v-for="destination in destinations">
-            <div class="card-header">Route Option Data</div>
+            <div class="card-header">Route Directions</div>
             <div class="card-body" v-if="destination.location">
                 <div class="form-label">
                     <p> Trip:
@@ -11,9 +11,9 @@
                 </div>
                 <div class="form-text">
                     <p>
-                        Duration: <small>{{ destination.duration }} <b>seconds</b> </small>
+                        Duration: <small>{{ destination.duration | secondsToMinutes}} <b>minutes</b> </small>
                         <br/>
-                        Distance: <small>{{ destination.distance }} <b>meters</b></small>
+                        Distance: <small>{{ destination.distance | metersToMiles}} <b>miles</b></small>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>

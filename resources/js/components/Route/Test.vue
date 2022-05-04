@@ -1,69 +1,66 @@
 <template>
     <div class="container">
-        <div class="card">
-            <div class="card-header">Route Plan</div>
-            <div class="card-body">
-                    <div class="col-3 mb-2">
-                        <label for="StartingPoint" class="form-label">Start PostCode</label>
-                        <div class="row">
-                            <input id="StartingPoint" type="text" class="form-control"
-                                   aria-describedby="startPostcode" v-model="start"/>
-                            <button class="btn btn-dark" @click="setPosition">Set Position</button>
-                        </div>
-                        <div id="startPostcode" class="form-text">
-                            This is the postcode we will plan your route from
-                        </div>
+        <div class="well">
+            <div class="col-3 mb-2">
+                <label for="StartingPoint" class="form-label">Starting Point PostCode</label>
+                <div class="row">
+                    <input id="StartingPoint" type="text" class="form-control" aria-describedby="startPostcode" v-model="start"/>
+                </div>
+                <div id="startPostcode" class="form-text">
+                    This is the postcode you will start from
+                </div>                
+                <div class="row my-3">
+                    <button class="btn btn-primary" @click="setPosition">Set starting point</button>
+                </div>
+
+            </div>
+            <div class="row my-3">
+                <label for="destinationsList" class="form-label">Destination Postcodes</label>
+                <div class="col align-content-center">
+                    <button v-show="destinations.length < 10" @click="addInput" type="button"
+                            id="add-destination-button" class="btn btn-outline-secondary">
+                        <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>-->
+                        Add another destination
+                        <span class="visually-hidden">Button</span>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
+                    <div class="col-8 pt-1">
+                        <label for="tripDestination" class="form-label">Destination {{ n }}</label>
+                        <input id="tripDestination" class="form-control" type="text" v-model="destination.location"/>
                     </div>
-                    <div class="row my-3">
-                        <label for="destinationsList" class="form-label">Destinations</label>
-                        <div class="col align-content-center">
-                            <div id="destinationsList" class="form-text">
-                                Click to add more destination inputs
-                            </div>
-                            <button v-show="destinations.length < 10" @click="addInput" type="button"
-                                    id="add-destination-button" class="btn btn-outline-secondary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                </svg>
-                                <span class="visually-hidden">Button</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
-                            <div class="col-8 pt-1">
-                                <label for="tripDestination" class="form-label">Destination {{ n }}</label>
-                                <input id="tripDestination" class="form-control" type="text" v-model="destination.location"/>
-                            </div>
-                            <div class="col-4 mt-auto">
-                                <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                    </svg>
-                                    <span class="visually-hidden">Button</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="container my-3">
-                        <button type="submit" class="btn btn-primary" @click="calculateRoute">
-                            Test
-                        </button>
-                        <button type="submit" class="btn btn-primary" @click="loadDestinations">
-                            Route
+                    <div class="col-4 mt-auto">
+                        <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                            <span class="visually-hidden">Button</span>
                         </button>
                     </div>
+                </div>
+            </div>
+            <div class="row my-3">
+                <!--<button type="submit" class="btn btn-primary" @click="calculateRoute">
+                    Test
+                </button>-->
+                <button type="submit" class="btn btn-primary" @click="loadDestinations">
+                    Plot Route
+                </button>
+            </div>
 <!--                <div id="map" style="min-height: 500px;">-->
 <!--                </div>-->
 
-                <div class="card h-100 mt-3" v-if="destinations[0].location">
-                    <directions
-                        ref="directions"
-                        v-bind:initial_destinations="destinations"
-                        v-bind:start="start"
-                    ></directions>
-                </div>
-          </div>
+            <div class="card h-100 mt-3" v-if="destinations[0].location">
+                <directions
+                    ref="directions"
+                    v-bind:initial_destinations="destinations"
+                    v-bind:start="start"
+                ></directions>
+            </div>
         </div>
     </div>
 </template>
