@@ -53,8 +53,8 @@
                             Route
                         </button>
                     </div>
-                <div id="map" style="min-height: 500px;">
-                </div>
+<!--                <div id="map" style="min-height: 500px;">-->
+<!--                </div>-->
 
                 <div class="card h-100 mt-3" v-if="destinations[0].location">
                     <directions
@@ -87,7 +87,7 @@ export default {
         }
     },
     mounted(){
-        this.loadmap();
+        // this.loadmap();
     },
     methods:{
         loadmap: function (){
