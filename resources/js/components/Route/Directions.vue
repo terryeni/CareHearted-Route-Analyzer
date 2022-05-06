@@ -13,7 +13,9 @@
                     <p>
                         Duration: <small>{{ destination.duration | secondsToMinutes}} <b>minutes</b> </small>
                         <br/>
-                        Distance: <small>{{ destination.distance | metersToMiles}} <b>miles</b></small>
+                        Distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
+                        <br/>
+                        Distance Between Points: <small>{{ destination.distance_between }} <b>Miles</b></small>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
@@ -55,6 +57,7 @@ export default {
                     this.destinations[i].route = route.directions;
                     this.destinations[i].duration = route.duration;
                     this.destinations[i].distance = route.distance;
+                    this.destinations[i].distance_between = route.distance_between;
                 }
                 else {
                     console.log("skipping getDirections");
