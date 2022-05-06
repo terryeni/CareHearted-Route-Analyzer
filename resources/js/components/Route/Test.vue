@@ -8,7 +8,7 @@
                 </div>
                 <div id="startPostcode" class="form-text">
                     This is the postcode you will start from
-                </div>                
+                </div>
                 <div class="row my-3">
                     <button class="btn btn-primary" @click="setPosition">Set starting point</button>
                 </div>
@@ -16,7 +16,7 @@
             </div>
             <div class="row my-3">
                 <label for="destinationsList" class="form-label">Destination Postcodes</label>
-                <div class="col align-content-center">
+                <div class="col align-content-center" id="destinationsList">
                     <button v-show="destinations.length < 10" @click="addInput" type="button"
                             id="add-destination-button" class="btn btn-outline-secondary">
                         <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
@@ -133,9 +133,14 @@ export default {
                         route.directions += step.maneuver.instruction;
                         route.directions += "\n";
                     },[this,route])
+                    let startF = coordinates.split(';')[0];
+                    let endF = coordinates.split(';')[1];
+                    let start = {lon:startF.split(',')[0],lat:startF.split(',')[1]};
+                    let end = {lon:endF.split(',')[0],lat:endF.split(',')[1]};
 
                     route.duration = response.data.routes[0].duration;
                     route.distance = response.data.routes[0].distance;
+                    route.distance_between = this.calculateClosestLocation(start, end);
                 }).catch(function (error){
                 console.log(error);
             });
@@ -166,6 +171,9 @@ export default {
         },
         removeInput(index){
             this.destinations.splice(index, 1);
+        },
+        calculateClosestLocation: function (start, end){
+            return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
         }
     }
 }
