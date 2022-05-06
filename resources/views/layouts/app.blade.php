@@ -16,7 +16,6 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <!-- Styles -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
@@ -24,7 +23,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                    <img class="mb-1" src="{{ asset('images/logo-carehearted_1.png') }}" alt="">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -35,10 +34,10 @@
                     <ul class="navbar-nav me-auto">
                         @auth
                             <li class="nav-link">`
-                                <a href="{{ url('/home') }}">Home</a>
+                                <strong><a href="{{ url('/home') }}">Home</a></strong>
                             </li>
                             <li class="nav-link">
-                                <a href="{{ url('/plan-route') }}">Plan Route</a>
+                                <strong><a href="{{ url('/plan-route') }}">Plan Route</a></strong>
                             </li>
                         @endauth
                     </ul>
