@@ -155,6 +155,7 @@ export default {
                 return cord;
         },
         loadDestinations: function (){
+            this.$refs.directions.calculateClosestDestination();
             this.$refs.directions.loadDirections();
         },
         addInput: function () {

@@ -15,7 +15,9 @@
                         <br/>
                         Distance: <small>{{ destination.distance | metresToMiles }} <b>miles</b></small>
                         <br/>
+                        <span v-if="destination.distance_between">
                         As the crow flies: <small>{{ destination.distance_between | twoDP }} <b>Miles</b></small>
+                        </span>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
@@ -63,7 +65,6 @@ export default {
                     console.log("skipping getDirections");
                 }
             }
-            await this.calculateClosestDestination();
             this.$forceUpdate();
         },
         calculateClosestDestination: async function() {
