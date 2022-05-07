@@ -131,7 +131,7 @@ export default {
 
                     route.duration = response.data.routes[0].duration;
                     route.distance = response.data.routes[0].distance;
-                    route.distance_between = this.calculateClosestLocation(start, end);
+                    route.distance_between = this.calculateDistanceBetweenLocations(start, end);
                 }).catch(function (error){
                 console.log(error);
             });
@@ -163,7 +163,7 @@ export default {
         removeInput(index){
             this.destinations.splice(index, 1);
         },
-        calculateClosestLocation: function (start, end){
+        calculateDistanceBetweenLocations: function (start, end){
             return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
         }
     }

@@ -62,9 +62,38 @@ export default {
                 else {
                     console.log("skipping getDirections");
                 }
-                this.$forceUpdate();
             }
-        }
+            await this.calculateClosestDestination();
+            this.$forceUpdate();
+        },
+        calculateClosestDestination: async function() {
+            let start_cordF = await this.$parent.getCoordinates(this.start);
+            let start_cord = {lon:start_cordF.split(',')[0],lat:start_cordF.split(',')[1]};
+
+            this.destinations = this.destinations.sort((loc1, loc2) => {
+                let first = {lon:loc1.coordinates.split(',')[0],lat:loc1.coordinates.split(',')[1]}
+                let second = {lon:loc2.coordinates.split(',')[0],lat:loc2.coordinates.split(',')[1]}
+
+                if (this.$parent.calculateDistanceBetweenLocations(start_cord, first) <
+                    this.$parent.calculateDistanceBetweenLocations(start_cord, second)) {
+                    return -1;
+                }
+
+                if (this.$parent.calculateDistanceBetweenLocations(start_cord, first) >
+                    this.$parent.calculateDistanceBetweenLocations(start_cord, second)) {
+                    return 1;
+                }
+                return 0;
+            });
+
+        },
+        calculateClosestLocation: function(start, loc1,loc2) {
+            this.destinations = this.destinations.sort((loc1, loc2) => {
+                let first = {lon:loc1.coordinates.split(',')[0],lat:loc1.coordinates.split(',')[1]}
+                let second = {lon:loc2.coordinates.split(',')[0],lat:loc2.coordinates.split(',')[1]}
+
+            });
+        },
     }
 }
 </script>
