@@ -29,6 +29,10 @@ Vue.filter('secondsToMinutes', function (time) {
 Vue.filter('metresToMiles', function (distance) {
     return (distance * 0.00062137).toFixed(2);
 })
+
+Vue.filter('twoDP', function (number) {
+    return (number).toFixed(2);
+})
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
