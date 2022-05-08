@@ -5,8 +5,8 @@
             <div class="card-body" v-if="destination.location">
                 <div class="form-label">
                     <p> Trip:
-                        <small> {{ destination.start_point }} </small> to
-                        <small> {{ destination.location}} </small>
+                        <small> {{ destination.start_point.location.toUpperCase() }} </small> to
+                        <small> {{ destination.location.toUpperCase() }} </small>
                     </p>
                 </div>
                 <div class="form-text">
@@ -29,10 +29,11 @@
 <script>
 export default {
     name: "Directions",
-    props: ['start', 'initial_destinations'],
+    props: ['initial_start', 'initial_destinations'],
     data(){
         return {
-            destinations: this.initial_destinations
+            destinations: this.initial_destinations,
+            start: {location:this.initial_start}
         }
     },
     mounted(){
@@ -44,32 +45,24 @@ export default {
                 if (i === 0)
                     this.destinations[i].start_point = this.start;
                 else
-                    this.destinations[i].start_point = this.destinations[i-1].location;
+                    this.destinations[i].start_point = this.destinations[i-1];
 
-                let coordinates = [await this.$parent.getCoordinates(this.destinations[i].start_point)];
-                let dest = await this.$parent.getCoordinates(this.destinations[i].location)
+                let coordinatesList = [this.destinations[i].start_point.coordinates];
+                coordinatesList.push(this.destinations[i].coordinates);
 
-                this.destinations[i].coordinates = dest;
-                coordinates.push(this.destinations[i].coordinates);
-                let coordinatesList = coordinates.join(";");
+                let coordinates = coordinatesList.join(";");
+                let route = await this.$parent.getDirections(coordinates);
 
-                if (!this.destinations[i].route){
-                    let route = await this.$parent.getDirections(coordinatesList);
+                this.destinations[i].route = route.directions;
+                this.destinations[i].duration = route.duration;
+                this.destinations[i].distance = route.distance;
+                this.destinations[i].distance_between = route.distance_between;
 
-                    this.destinations[i].route = route.directions;
-                    this.destinations[i].duration = route.duration;
-                    this.destinations[i].distance = route.distance;
-                    this.destinations[i].distance_between = route.distance_between;
-                }
-                else {
-                    console.log("skipping getDirections");
-                }
             }
             this.$forceUpdate();
         },
         calculateClosestDestination: async function() {
-            let start_cordF = await this.$parent.getCoordinates(this.start);
-            let start_cord = {lon:start_cordF.split(',')[0],lat:start_cordF.split(',')[1]};
+            let start_cord = {lon:this.start.coordinates.split(',')[0],lat:this.start.coordinates.split(',')[1]};
 
             this.destinations = this.destinations.sort((loc1, loc2) => {
                 let first = {lon:loc1.coordinates.split(',')[0],lat:loc1.coordinates.split(',')[1]}
@@ -87,6 +80,16 @@ export default {
                 return 0;
             });
 
+        },
+        addCoordinatesToDestinations: async function () {
+            this.destinations.map(async function (destination, i){
+                let coordinates = await this.$parent.getCoordinates(destination.location)
+
+                this.destinations[i].coordinates = coordinates;
+            },this);
+        },
+        setStartingPoint: async function () {
+            this.start.coordinates = await this.$parent.getCoordinates(this.start.location);
         },
         calculateClosestLocation: function(start, loc1,loc2) {
             this.destinations = this.destinations.sort((loc1, loc2) => {

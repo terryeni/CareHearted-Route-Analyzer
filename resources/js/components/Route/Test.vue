@@ -50,7 +50,7 @@
             <directions
                 ref="directions"
                 v-bind:initial_destinations="destinations"
-                v-bind:start="start"
+                v-bind:initial_start="start"
             ></directions>
         </div>
     </div>
@@ -154,9 +154,11 @@ export default {
                         });
                 return cord;
         },
-        loadDestinations: function (){
-            this.$refs.directions.calculateClosestDestination();
-            this.$refs.directions.loadDirections();
+        loadDestinations: async function (){
+            await this.$refs.directions.setStartingPoint();
+            await this.$refs.directions.addCoordinatesToDestinations();
+            await this.$refs.directions.loadDirections();
+            this.$forceUpdate();
         },
         addInput: function () {
             this.destinations.push({location:''});
