@@ -43,8 +43,6 @@
         <button type="submit" class="btn btn-primary" @click="loadDestinations">
                 Plot Route
         </button>
-<!--                <div id="map" style="min-height: 500px;">-->
-<!--                </div>-->
 
         <div class="card h-100 mt-3" v-if="destinations[0].location">
             <directions
@@ -52,6 +50,13 @@
                 v-bind:initial_destinations="destinations"
                 v-bind:start="start"
             ></directions>
+        </div>
+
+        <div class="row mb-2">
+
+        </div>
+
+        <div id="map" style="min-height: 500px;">
         </div>
     </div>
 </template>

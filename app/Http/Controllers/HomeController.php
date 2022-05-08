@@ -30,4 +30,10 @@ class HomeController extends Controller
     {
         return view('route.plan');
     }
+
+    public function help()
+    {
+        return view('help');
+    }
+
 }

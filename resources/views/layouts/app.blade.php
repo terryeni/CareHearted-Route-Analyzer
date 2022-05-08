@@ -39,6 +39,9 @@
                             <li class="nav-link">
                                 <strong><a href="{{ url('/plan-route') }}">Plan Route</a></strong>
                             </li>
+                            <li class="nav-link">
+                                <strong><a href="{{ url('/help') }}">Help</a></strong>
+                            </li>
                         @endauth
                     </ul>
 

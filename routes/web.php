@@ -20,3 +20,4 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('pl
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('plan-route');
 
 Route::get('/plan-route', [App\Http\Controllers\HomeController::class, 'planRoute'])->name('plan-route');
+Route::get('/help', [App\Http\Controllers\HomeController::class, 'help'])->name('help');
