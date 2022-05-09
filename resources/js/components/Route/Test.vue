@@ -44,7 +44,7 @@
                 Plot Route
         </button>
 
-        <div class="card h-100 mt-3" v-if="destinations[0].location">
+        <div class="card mt-3" v-if="destinations[0].location">
             <directions
                 ref="directions"
                 v-bind:initial_destinations="destinations"
