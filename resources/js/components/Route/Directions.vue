@@ -13,9 +13,9 @@
                     <p>
                         Duration: <small>{{ destination.duration | secondsToMinutes}} <b>minutes</b> </small>
                         <br/>
-                        Distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
+                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
                         <br/>
-                        Distance Between Points: <small>{{ destination.distance_between }} <b>Miles</b></small>
+                        Direct distance: <small>{{ destination.distance_between }} <b>Miles</b></small>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
