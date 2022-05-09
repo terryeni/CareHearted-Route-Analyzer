@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import Vue from "vue";
+
 export default {
     name: "Directions",
     props: ['initial_start', 'initial_destinations'],
@@ -41,6 +43,8 @@ export default {
     },
     methods: {
         loadDirections: async function (){
+            await this.calculateClosestLocation();
+
             for (let i = 0; i < this.destinations.length; i++){
                 if (i === 0)
                     this.destinations[i].start_point = this.start;
@@ -81,22 +85,24 @@ export default {
             });
 
         },
-        addCoordinatesToDestinations: async function () {
+        setStartingPoint: async function () {
+            let start_coordinates = await this.$parent.getCoordinates(this.start.location);
+            Vue.set(this.start,'coordinates', start_coordinates);
+        },
+        calculateClosestLocation: async function() {
             this.destinations.map(async function (destination, i){
-                let coordinates = await this.$parent.getCoordinates(destination.location)
+                let distance = await this.getDistance(this.start,destination);
 
-                this.destinations[i].coordinates = coordinates;
+                Vue.set(this.destinations[i],'distance_to_next',distance);
+
             },this);
         },
-        setStartingPoint: async function () {
-            this.start.coordinates = await this.$parent.getCoordinates(this.start.location);
-        },
-        calculateClosestLocation: function(start, loc1,loc2) {
-            this.destinations = this.destinations.sort((loc1, loc2) => {
-                let first = {lon:loc1.coordinates.split(',')[0],lat:loc1.coordinates.split(',')[1]}
-                let second = {lon:loc2.coordinates.split(',')[0],lat:loc2.coordinates.split(',')[1]}
+        getDistance: async function (start, destination){
+            let loc1 = {lon:start.coordinates.split(',')[0],lat:start.coordinates.split(',')[1]}
+            let loc2 = {lon:destination.coordinates.split(',')[0],lat:destination.coordinates.split(',')[1]}
 
-            });
+            let distance = this.$parent.calculateDistanceBetweenLocations(loc1,loc2);
+            return distance;
         },
     }
 }

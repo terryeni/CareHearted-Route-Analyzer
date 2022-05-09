@@ -28,7 +28,8 @@
             <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
                 <div class="col-8 pt-1">
                     <label for="tripDestination" class="form-label">Destination {{ n }}</label>
-                    <input id="tripDestination" class="form-control" type="text" v-model="destination.location"/>
+                    <input id="tripDestination" class="form-control" type="text" v-model="destination.location"
+                           @focusout="updateDestinationData(destination)"/>
                 </div>
                 <div class="col-4 mt-auto">
                     <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
@@ -59,6 +60,7 @@
 <script>
 import mapboxgl from 'mapbox-gl';
 import Directions from "./Directions";
+import Vue from "vue";
 export default {
     name: "Test",
     components: {Directions},
@@ -101,13 +103,10 @@ export default {
                     this.longitude = response.data.features[0].geometry.coordinates[0];
                     this.latitude = response.data.features[0].geometry.coordinates[1];
                     this.location_data = response;
-                    this.loadmap();
+                    // this.loadmap();
                 }).catch(function (error){
                     console.log(error);
                 });
-        },
-        calculateRoute: async function (){
-            this.destinations.push({location:'B92 0DL'},{location:'B92 8PS'});
         },
         getDirections: async function (coordinates){
             let route = {directions:''};
@@ -156,7 +155,6 @@ export default {
         },
         loadDestinations: async function (){
             await this.$refs.directions.setStartingPoint();
-            await this.$refs.directions.addCoordinatesToDestinations();
             await this.$refs.directions.loadDirections();
             this.$forceUpdate();
         },
@@ -168,7 +166,12 @@ export default {
         },
         calculateDistanceBetweenLocations: function (start, end){
             return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
-        }
+        },
+        updateDestinationData: async function (destination) {
+            let coordinates = await this.getCoordinates(destination.location);
+
+            Vue.set(destination,'coordinates',coordinates);
+        },
     }
 }
 </script>
