@@ -2,8 +2,8 @@
     <div class="container">
         <div class="col-4"><h1>Route Planner</h1></div>
         <div class="col-3 mb-2">
-            <input id="StartingPoint" type="text" class="form-control mb-1" aria-describedby="startPostcode" v-model="start" placeholder="Starting Postcode"/>
-            <button class="btn btn-primary" @click="setPosition">Set starting point</button>
+            <input id="StartingPoint" type="text" class="form-control mb-1" aria-describedby="startPostcode" v-model="start.location" placeholder="Starting Postcode"/>
+            <button class="btn btn-primary" @click="setPosition" @focusout="updateDestinationData(start)">Set starting point</button>
             <div id="startPostcode" class="form-text">
                 This is the postcode you will start from
             </div>
@@ -67,7 +67,7 @@ export default {
     props:['start_point','access_token'],
     data() {
         return {
-            start: this.start_point,
+            start: {location:this.start_point},
             longitude: -1.7775,
             latitude: 52.4159,
             location_data: '',
@@ -154,7 +154,7 @@ export default {
                 return cord;
         },
         loadDestinations: async function (){
-            await this.$refs.directions.setStartingPoint();
+            // await this.$refs.directions.setStartingPoint();
             await this.$refs.directions.loadDirections();
             this.$forceUpdate();
         },
@@ -168,9 +168,11 @@ export default {
             return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
         },
         updateDestinationData: async function (destination) {
-            let coordinates = await this.getCoordinates(destination.location);
+            if (destination.location) {
+                let coordinates = await this.getCoordinates(destination.location);
 
-            Vue.set(destination,'coordinates',coordinates);
+                Vue.set(destination, 'coordinates', coordinates);
+            }
         },
     }
 }

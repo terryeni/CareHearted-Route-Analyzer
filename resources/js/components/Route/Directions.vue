@@ -35,7 +35,7 @@ export default {
     data(){
         return {
             destinations: this.initial_destinations,
-            start: {location:this.initial_start}
+            start: this.initial_start
         }
     },
     mounted(){
@@ -44,10 +44,12 @@ export default {
     methods: {
         loadDirections: async function (){
             await this.calculateClosestLocation();
-
             for (let i = 0; i < this.destinations.length; i++){
-                if (i === 0)
+                if (i === 0){
+                    if (!this.start.coordinates)
+                        await this.setStartingPoint();
                     this.destinations[i].start_point = this.start;
+                }
                 else
                     this.destinations[i].start_point = this.destinations[i-1];
 
