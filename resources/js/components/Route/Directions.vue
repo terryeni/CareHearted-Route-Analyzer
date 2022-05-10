@@ -39,6 +39,7 @@ export default {
             currentFrom: this.initial_start,
             currentTo: '',
             routes:[],
+            idToRemove:''
         }
     },
     mounted(){
@@ -51,9 +52,12 @@ export default {
     },
     methods: {
         calculateRoutes: async function ( ){
-            await this.calculateClosestLocation();
-            this.pickNextDestination();
-            await this.getRoute();
+            for(let i = 0; i < this.destinations.length; i++){
+                await this.calculateClosestLocation();
+                this.pickNextDestination();
+                await this.getRoute();
+                Vue.set(this,'currentFrom',this.currentTo);
+            }
         },
         getRoute: async function () {
             let coordinatesList = [this.currentFrom.coordinates];
@@ -67,8 +71,10 @@ export default {
             Vue.set(this.currentTo,'duration',route.duration);
             Vue.set(this.currentTo,'distance',route.distance);
             Vue.set(this.currentTo,'distance_between',route.distance_between);
+            Vue.set(this.currentTo,'start_point',this.currentFrom);
 
             this.routes.push(this.currentTo);
+            this.destinations.splice(this.idToRemove,1);
         },
         loadDirections: async function (){
             await this.calculateClosestLocation();
@@ -141,6 +147,7 @@ export default {
                     }
                 }
             },this, id_to_remove)
+            Vue.set(this,'idToRemove',id_to_remove);
         },
         getDistance: async function (start, destination){
             let loc1 = {lon:start.coordinates.split(',')[0],lat:start.coordinates.split(',')[1]}
