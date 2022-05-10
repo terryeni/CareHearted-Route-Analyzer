@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" @click="loadDestinations">
+        <button type="submit" class="btn btn-primary" @click="plotRoute">
                 Plot Route
         </button>
 <!--                <div id="map" style="min-height: 500px;">-->
@@ -157,6 +157,9 @@ export default {
             // await this.$refs.directions.setStartingPoint();
             await this.$refs.directions.loadDirections();
             this.$forceUpdate();
+        },
+        plotRoute: async function () {
+            await this.$refs.directions.calculateRoutes();
         },
         addInput: function () {
             this.destinations.push({location:''});
