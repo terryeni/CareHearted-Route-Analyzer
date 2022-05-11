@@ -39,7 +39,8 @@ export default {
             currentFrom: this.initial_start,
             currentTo: '',
             routes:[],
-            idToRemove:''
+            idToRemove:'',
+            routedCount: 0,
         }
     },
     mounted(){
@@ -48,11 +49,14 @@ export default {
     computed: {
         the_destinations() {
             return this.routes;
-        }
+        },
+        initial_destination_count(){
+            return this.destinations.length + this.routedCount;
+        },
     },
     methods: {
         calculateRoutes: async function ( ){
-            for(let i = 0; i < this.destinations.length; i++){
+            for(let i = 0; i < this.initial_destination_count; i++){
                 await this.calculateClosestLocation();
                 this.pickNextDestination();
                 await this.getRoute();
@@ -74,7 +78,7 @@ export default {
             Vue.set(this.currentTo,'start_point',this.currentFrom);
 
             this.routes.push(this.currentTo);
-            this.destinations.splice(this.idToRemove,1);
+            this.removeFromToRoute();
         },
         loadDirections: async function (){
             await this.calculateClosestLocation();
@@ -135,7 +139,7 @@ export default {
         },
         pickNextDestination: function () {
             let id_to_remove;
-            this.count = this.destinations.length;
+
             this.destinations.map(function (destination, i) {
                 if (i < this.destinations.length-1) {
                     if (destination.distance_to_next < this.destinations[i + 1].distance_to_next) {
@@ -143,11 +147,19 @@ export default {
                         id_to_remove = i;
                     } else {
                         Vue.set(this,'currentTo',this.destinations[i+1]);
-                        id_to_remove = i;
+                        id_to_remove = i+1;
                     }
+                }
+                if (this.destinations.length === 1){
+                    Vue.set(this,'currentTo',destination);
+                    id_to_remove = i;
                 }
             },this, id_to_remove)
             Vue.set(this,'idToRemove',id_to_remove);
+        },
+        removeFromToRoute: function () {
+            this.destinations.splice(this.idToRemove,1);
+            this.routedCount +=1;
         },
         getDistance: async function (start, destination){
             let loc1 = {lon:start.coordinates.split(',')[0],lat:start.coordinates.split(',')[1]}
