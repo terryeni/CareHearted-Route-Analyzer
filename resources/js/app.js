@@ -20,7 +20,7 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('mapbox-test', require('./components/Route/Test.vue').default);
+Vue.component('route-planner', require('./components/Route/RoutePlanner').default);
 
 Vue.filter('secondsToMinutes', function (time) {
     return (time/ 60).toFixed(2);

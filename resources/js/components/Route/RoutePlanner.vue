@@ -68,7 +68,7 @@ import mapboxgl from 'mapbox-gl';
 import Directions from "./Directions";
 import Vue from "vue";
 export default {
-    name: "Test",
+    name: "RoutePlanner",
     components: {Directions},
     props:['start_point','access_token'],
     data() {
