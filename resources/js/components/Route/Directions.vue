@@ -13,11 +13,12 @@
                     <p>
                         Duration: <small>{{ destination.duration | secondsToMinutes }} <b>minutes</b> </small>
                         <br/>
-                        Distance: <small>{{ destination.distance | metresToMiles }} <b>miles</b></small>
+                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
                         <br/>
                         <span v-if="destination.distance_between">
-                        As the crow flies: <small>{{ destination.distance_between | twoDP }} <b>Miles</b></small>
+                        Direct distance: <small>{{ destination.distance_between | twoDP}} <b>Miles</b></small>
                         </span>
+                        <br/>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
