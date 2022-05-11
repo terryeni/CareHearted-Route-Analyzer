@@ -2,8 +2,9 @@
     <div class="container">
         <div class="col-4"><h1>Route Planner</h1></div>
         <div class="col-3 mb-2">
-            <input id="StartingPoint" type="text" class="form-control mb-1" aria-describedby="startPostcode" v-model="start.location" placeholder="Starting Postcode"/>
-            <button class="btn btn-primary" @click="setPosition" @focusout="updateDestinationData(start)">Set starting point</button>
+            <input id="StartingPoint" type="text" class="form-control mb-1"aria-describedby="startPostcode"
+                   v-model="start.location" placeholder="Starting Postcode" @focusout="updateDestinationData(start)" />
+<!--            <button class="btn btn-primary" @click="updateDestinationData(start)">Set starting point</button>-->
             <div id="startPostcode" class="form-text">
                 This is the postcode you will start from
             </div>
@@ -95,7 +96,10 @@ export default {
                 'top-left'
             );
         },
-        setPosition: function (){
+        setStartingPosition: function () {
+            this.$refs.directions.setStartingPoint();
+        },
+        setMapPosition: function (){
             // call https://api.mapbox.com/geocoding/v5/{endpoint}/{search_text}.json?access_token=
             axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/'
                 + this.start + '.json?access_token=' + this.access_token)

@@ -56,12 +56,21 @@ export default {
     },
     methods: {
         calculateRoutes: async function ( ){
-            for(let i = 0; i < this.initial_destination_count; i++){
-                await this.calculateClosestLocation();
-                this.pickNextDestination();
-                await this.getRoute();
-                Vue.set(this,'currentFrom',this.currentTo);
-            }
+            Promise.resolve([
+                this.setDestinationCoordinates(),
+                this.setStartingPoint(),
+                true
+            ]).then(async () => {
+                for(let i = 0; i < this.initial_destination_count; i++) {
+                    await this.calculateClosestLocation();
+                    this.pickNextDestination();
+                    await this.getRoute();
+                    Vue.set(this,'currentFrom',this.currentTo);
+                }
+            }).catch( function (error){
+                console.log(error)
+            });
+
         },
         getRoute: async function () {
             let coordinatesList = [this.currentFrom.coordinates];
@@ -128,6 +137,15 @@ export default {
         setStartingPoint: async function () {
             let start_coordinates = await this.$parent.getCoordinates(this.start.location);
             Vue.set(this.start,'coordinates', start_coordinates);
+        },
+        setDestinationCoordinates: function () {
+            this.destinations.map(async function (destination, i)
+            {
+                let coordinates = await this.$parent.getCoordinates(destination.location);
+                Vue.set(this.destinations[i], 'coordinates', coordinates);
+            },this);
+
+            return this.destinations;
         },
         calculateClosestLocation: async function() {
             this.destinations.map(async function (destination, i){
