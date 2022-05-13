@@ -20,7 +20,7 @@ window.Vue = require('vue').default;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('mapbox-test', require('./components/Route/Test.vue').default);
+Vue.component('route-planner', require('./components/Route/RoutePlanner.vue').default);
 
 Vue.filter('secondsToMinutes', function (time) {
     return (time/ 60).toFixed(2);
@@ -28,6 +28,10 @@ Vue.filter('secondsToMinutes', function (time) {
 
 Vue.filter('metresToMiles', function (distance) {
     return (distance * 0.00062137).toFixed(2);
+})
+
+Vue.filter('twoDP', function (number) {
+    return (number).toFixed(2);
 })
 /**
  * Next, we will create a fresh Vue application instance and attach it to

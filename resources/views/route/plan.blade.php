@@ -9,10 +9,10 @@
             <div class="col-2">
             </div>
             <div class="col-8">
-                <mapbox-test
+                <route-planner
                     v-bind:access_token="'{{config('mapbox.access_token')}}'"
                     v-bind:start_point="'{{config('mapbox.start_point')}}'"
-                ></mapbox-test>
+                ></route-planner>
             </div>
             <div class="col-2">
             </div>

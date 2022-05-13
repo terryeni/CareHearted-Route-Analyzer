@@ -41,7 +41,7 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary" @click="loadDestinations">
-                Plot Route
+            Plot Route
         </button>
 
         <div class="card mt-3" v-if="destinations[0].location">
@@ -108,8 +108,8 @@ export default {
                     this.location_data = response;
                     this.loadmap();
                 }).catch(function (error){
-                    console.log(error);
-                });
+                console.log(error);
+            });
         },
         calculateRoute: async function (){
             this.destinations.push({location:'B92 0DL'},{location:'B92 8PS'});
@@ -138,26 +138,26 @@ export default {
                     route.distance = response.data.routes[0].distance;
                     route.distance_between = this.calculateClosestLocation(start, end);
                 }).catch(function (error){
-                console.log(error);
-            });
+                    console.log(error);
+                });
 
             return route;
         },
         getCoordinates: async function (search){
             let cord;
-                await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/'
-                    + search + '.json?access_token=' + this.access_token)
-                        .then((response) => {
+            await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/'
+                + search + '.json?access_token=' + this.access_token)
+                .then((response) => {
 
-                            let longitude = response.data.features[0].geometry.coordinates[0];
-                            let latitude = response.data.features[0].geometry.coordinates[1];
-                            cord = longitude + ',' + latitude;
+                    let longitude = response.data.features[0].geometry.coordinates[0];
+                    let latitude = response.data.features[0].geometry.coordinates[1];
+                    cord = longitude + ',' + latitude;
 
-                        })
-                        .catch(function (error){
-                            console.log(error);
-                        });
-                return cord;
+                })
+                .catch(function (error){
+                    console.log(error);
+                });
+            return cord;
         },
         loadDestinations: function (){
             this.$refs.directions.loadDirections();
