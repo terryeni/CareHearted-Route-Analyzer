@@ -42,11 +42,11 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" @click="plotRoute">
+        <button type="submit" class="btn btn-primary" @click="plotRoute" :disabled="showPrep === true">
                 Plot Route
         </button>
 
-        <div class="card mt-3" v-if="destinations[0].location">
+        <div class="card mt-3">
             <directions
                 ref="directions"
                 v-bind:initial_destinations="destinations"
@@ -74,8 +74,8 @@ export default {
     data() {
         return {
             start: {location:this.start_point},
-            longitude: -1.7775,
-            latitude: 52.4159,
+            longitude: '',
+            latitude: '',
             location_data: '',
             destination1: '',
             destination2: '',
@@ -84,6 +84,11 @@ export default {
     },
     mounted(){
         // this.loadmap();
+    },
+    computed: {
+        showPrep() {
+            return !this.destinations[0].coordinates || !this.start.coordinates;
+        }
     },
     methods:{
         loadmap: function (){

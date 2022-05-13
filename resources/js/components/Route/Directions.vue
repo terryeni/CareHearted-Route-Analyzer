@@ -11,9 +11,9 @@
                 </div>
                 <div class="form-text">
                     <p>
-                        Duration: <small>{{ destination.duration | secondsToMinutes }} <b>minutes</b> </small>
+                        Duration: <small>{{ destination.duration | secondsToMinutes }} <b>Minutes</b> </small>
                         <br/>
-                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
+                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>Miles</b></small>
                         <br/>
                         <span v-if="destination.distance_between">
                         Direct distance: <small>{{ destination.distance_between | twoDP}} <b>Miles</b></small>
@@ -42,6 +42,7 @@ export default {
             routes:[],
             idToRemove:'',
             routedCount: 0,
+            skipPromise:true
         }
     },
     mounted(){
@@ -57,6 +58,19 @@ export default {
     },
     methods: {
         calculateRoutes: async function ( ){
+
+        if (this.skipPromise)
+        {
+            await this.setStartingPoint();
+            this.setDestinationCoordinates();
+            for (let i = 0; i < this.initial_destination_count; i++) {
+                await this.calculateClosestLocation();
+                this.pickNextDestination();
+                await this.getRoute();
+                Vue.set(this, 'currentFrom', this.currentTo);
+            }
+        } else
+        {
             Promise.resolve([
                 this.setDestinationCoordinates(),
                 this.setStartingPoint(),
@@ -72,6 +86,7 @@ export default {
                 console.log(error)
             });
 
+        }
         },
         getRoute: async function () {
             let coordinatesList = [this.currentFrom.coordinates];
