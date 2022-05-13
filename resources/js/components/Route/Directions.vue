@@ -58,35 +58,33 @@ export default {
     },
     methods: {
         calculateRoutes: async function ( ){
-
-        if (this.skipPromise)
-        {
-            await this.setStartingPoint();
-            this.setDestinationCoordinates();
-            for (let i = 0; i < this.initial_destination_count; i++) {
-                await this.calculateClosestLocation();
-                this.pickNextDestination();
-                await this.getRoute();
-                Vue.set(this, 'currentFrom', this.currentTo);
-            }
-        } else
-        {
-            Promise.resolve([
-                this.setDestinationCoordinates(),
-                this.setStartingPoint(),
-                true
-            ]).then(async () => {
-                for(let i = 0; i < this.initial_destination_count; i++) {
+            if (this.skipPromise)
+            {
+                await this.setStartingPoint();
+                this.setDestinationCoordinates();
+                for (let i = 0; i < this.initial_destination_count; i++) {
                     await this.calculateClosestLocation();
-                    this.pickNextDestination();
                     await this.getRoute();
-                    Vue.set(this,'currentFrom',this.currentTo);
+                    Vue.set(this, 'currentFrom', this.currentTo);
                 }
-            }).catch( function (error){
-                console.log(error)
-            });
+            } else
+            {
+                Promise.resolve([
+                    this.setDestinationCoordinates(),
+                    this.setStartingPoint(),
+                    true
+                ]).then(async () => {
+                    for(let i = 0; i < this.initial_destination_count; i++) {
+                        await this.calculateClosestLocation();
+                        this.pickNextDestination();
+                        await this.getRoute();
+                        Vue.set(this,'currentFrom',this.currentTo);
+                    }
+                }).catch( function (error){
+                    console.log(error)
+                });
 
-        }
+            }
         },
         getRoute: async function () {
             let coordinatesList = [this.currentFrom.coordinates];
@@ -103,7 +101,11 @@ export default {
             Vue.set(this.currentTo,'start_point',this.currentFrom);
 
             this.routes.push(this.currentTo);
-            this.removeFromToRoute();
+            this.destinations.filter(function(dest,i){
+                if(dest.location === this.currentTo.location
+                    && dest.coordinates === this.currentTo.coordinates)
+                    Vue.set(this.destinations[i],'routed',true);
+            },this);
         },
         loadDirections: async function (){
             await this.calculateClosestLocation();
@@ -170,6 +172,13 @@ export default {
                 Vue.set(this.destinations[i],'distance_to_next',distance);
 
             },this);
+
+            let whereTo = this.destinations.reduce(function (prev, current) {
+                if (current.routed === true) return prev
+                return current.distance_to_next > prev.distance_to_next
+                    ? current : prev;
+            });
+            Vue.set(this, 'currentTo',whereTo);
         },
         pickNextDestination: function () {
             let id_to_remove;
