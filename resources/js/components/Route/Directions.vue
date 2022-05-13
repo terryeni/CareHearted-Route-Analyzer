@@ -11,11 +11,11 @@
                 </div>
                 <div class="form-text">
                     <p>
-                        Duration: <small>{{ destination.duration | secondsToMinutes}} <b>minutes</b> </small>
+                        Duration: <small>{{ destination.duration | secondsToMinutes}} <b>Minutes</b> </small>
                         <br/>
-                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>miles</b></small>
+                        Driving distance: <small>{{ destination.distance | metresToMiles}} <b>Miles</b></small>
                         <br/>
-                        Direct distance: <small>{{ destination.distance_between }} <b>Miles</b></small>
+                        Direct distance: <small>{{ destination.distance_between | twoDP }} <b>Miles</b></small>
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
