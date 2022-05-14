@@ -65,7 +65,7 @@
 import mapboxgl from 'mapbox-gl';
 import Directions from "./Directions";
 export default {
-    name: "Test",
+    name: "RoutePlanner",
     components: {Directions},
     props:['start_point','access_token'],
     data() {
