@@ -4,7 +4,7 @@
 return [
 
     'access_token' => env('mapbox_access_token', '12345678'),
-    'start_point' => 'B91 2AA'
+    'start_point' => env('mapbox_start_point','')
     ];
 
 //The forward geocoding query type allows you to look up a single location by name and returns its geographic coordinates.
