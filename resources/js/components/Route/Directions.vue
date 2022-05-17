@@ -58,12 +58,7 @@ export default {
                 return current.distance_to_next < prev.distance_to_next
                     ? current : prev;
             });
-            let done = this.destinations.filter(function (dest,i ){
-                if (dest.location === whereTo.location ){
-                    return i;
-                }
-            },whereTo);
-            this.idToRemove = done[0];
+
             Vue.set(this, 'currentTo',whereTo);
             console.log("current to is " + this.currentTo.location);
             return whereTo;
