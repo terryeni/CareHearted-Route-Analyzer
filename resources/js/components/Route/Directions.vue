@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div v-for="destination in destinations">
+        <div v-for="destination in the_destinations">
             <div class="card-header">Route Directions</div>
             <div class="card-body" v-if="destination.location">
                 <div class="form-label">
@@ -25,46 +25,115 @@
 </template>
 
 <script>
+import Vue from "vue";
+
 export default {
     name: "Directions",
-    props: ['start', 'initial_destinations'],
+    props: ['initial_start', 'initial_destinations'],
     data(){
         return {
-            destinations: this.initial_destinations
+            destinations: this.initial_destinations,
+            currentFrom: {location:this.initial_start},
+            currentTo: '',
+            start: {location:this.initial_start},
+            routes:[],
         }
+    },
+    computed : {
+        the_destinations(){
+            if (this.routes.length)
+                return this.routes;
+            return this.destinations;
+        },
     },
     mounted(){
 
     },
     methods: {
+        nextDestination: async function() {
+            await this.setStartCoordinates();
+            await this.calculateClosestLocation();
+            let whereTo = this.destinations.reduce(function (prev, current) {
+                if (current.routed === true) return prev;
+                return current.distance_to_next < prev.distance_to_next
+                    ? current : prev;
+            });
+            let done = this.destinations.filter(function (dest,i ){
+                if (dest.location === whereTo.location ){
+                    return i;
+                }
+            },whereTo);
+            this.idToRemove = done[0];
+            Vue.set(this, 'currentTo',whereTo);
+            console.log("current to is " + this.currentTo.location);
+            return whereTo;
+        },
         loadDirections: async function (){
+
+            await this.setDestinationCoordinates();
             for (let i = 0; i < this.destinations.length; i++){
                 if (i === 0)
-                    this.destinations[i].start_point = this.start;
+                    this.destinations[i].start_point = this.start.location;
                 else
-                    this.destinations[i].start_point = this.destinations[i-1].location;
+                    Vue.set(this.destinations[i],'start_point',this.currentFrom.location);
+
+                console.log("current from is " + this.currentFrom.location + "------ iteration " + i);
 
                 let coordinates = [await this.$parent.getCoordinates(this.destinations[i].start_point)];
-                let dest = await this.$parent.getCoordinates(this.destinations[i].location)
+                let whereTo = await this.nextDestination();
 
-                this.destinations[i].coordinates = dest;
-                coordinates.push(this.destinations[i].coordinates);
+                console.log("the current to is " + this.currentTo.location);
+                whereTo.start_point = this.currentFrom.location;
+
+                let dest = await this.$parent.getCoordinates(this.currentTo.location);
+                whereTo.coordinates = dest;
+                coordinates.push(whereTo.coordinates);
                 let coordinatesList = coordinates.join(";");
 
-                if (!this.destinations[i].route){
-                    let route = await this.$parent.getDirections(coordinatesList);
+                let route = await this.$parent.getDirections(coordinatesList);
+                console.log("Route:");
+                console.log(route);
+                this.destinations.find(destination => { if ( destination.location === whereTo.location ) { destination.routed = true; } })
+                this.routes.push({
+                    start_point: this.currentFrom.location,
+                    location: this.currentTo.location,
+                    coordinates: dest,route: route.directions,
+                    duration: route.duration,distance: route.distance,distance_between: route.distance_between
+                });
+                Vue.set(this,'currentFrom',whereTo);
+                console.log("we just added 'routed' to the data for " + whereTo.location);
 
-                    this.destinations[i].route = route.directions;
-                    this.destinations[i].duration = route.duration;
-                    this.destinations[i].distance = route.distance;
-                    this.destinations[i].distance_between = route.distance_between;
-                }
-                else {
-                    console.log("skipping getDirections");
-                }
                 this.$forceUpdate();
             }
-        }
+        },
+        calculateClosestLocation: async function() {
+            this.destinations.map(async function (destination, i){
+                let distance = await this.getDistance(this.currentFrom,destination);
+
+                Vue.set(this.destinations[i],'distance_to_next',distance);
+
+            },this);
+        },
+        getDistance: async function (start, destination){
+            let loc1 = {lon:start.coordinates.split(',')[0],lat:start.coordinates.split(',')[1]}
+            let loc2 = {lon:destination.coordinates.split(',')[0],lat:destination.coordinates.split(',')[1]}
+
+            let distance = this.$parent.calculateDistanceBetweenLocations(loc1,loc2);
+            return distance;
+        },
+        setStartCoordinates: async function () {
+            let start_coordinates = await this.$parent.getCoordinates(this.currentFrom.location);
+            Vue.set(this.currentFrom,'coordinates', start_coordinates);
+        },
+        setDestinationCoordinates: function () {
+            this.destinations.map(async function (destination, i)
+            {
+                let coordinates = await this.$parent.getCoordinates(destination.location);
+                Vue.set(this.destinations[i], 'coordinates', coordinates);
+            },this);
+
+            return this.destinations;
+        },
     }
 }
 </script>

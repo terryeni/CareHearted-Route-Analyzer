@@ -48,7 +48,7 @@
             <directions
                 ref="directions"
                 v-bind:initial_destinations="destinations"
-                v-bind:start="start"
+                v-bind:initial_start="start"
             ></directions>
         </div>
 
@@ -170,7 +170,10 @@ export default {
         },
         calculateClosestLocation: function (start, end){
             return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
-        }
+        },
+        calculateDistanceBetweenLocations: function (start, end){
+            return this.$root.distance(start.lat,start.lon, end.lat, end.lon,'M');
+        },
     }
 }
 </script>
