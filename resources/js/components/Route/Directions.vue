@@ -64,17 +64,12 @@ export default {
             return whereTo;
         },
         loadDirections: async function (){
-
             await this.setDestinationCoordinates();
             for (let i = 0; i < this.destinations.length; i++){
-                if (i === 0)
-                    this.destinations[i].start_point = this.start.location;
-                else
-                    Vue.set(this.destinations[i],'start_point',this.currentFrom.location);
 
                 console.log("current from is " + this.currentFrom.location + "------ iteration " + i);
 
-                let coordinates = [await this.$parent.getCoordinates(this.destinations[i].start_point)];
+                let coordinates = [await this.$parent.getCoordinates(this.currentFrom.location)];
                 let whereTo = await this.nextDestination();
 
                 console.log("the current to is " + this.currentTo.location);
