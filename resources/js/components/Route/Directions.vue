@@ -50,18 +50,54 @@ export default {
 
     },
     methods: {
+        sleep: async function (ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        testReduce: function(){
+            let smallestletter = this.destinations.reduce(function (prev,current){
+                console.log("PREVIOUS:")
+                console.log(prev.location);
+                console.log("CURRENT:")
+               console.log(current.location);
+                console.log("\n\n");
+                return prev.location < current.location ? prev : current;
+            });
+            console.log("the smallest was" + smallestletter.location);
+        },
         nextDestination: async function() {
             await this.setStartCoordinates();
             await this.calculateClosestLocation();
-            let whereTo = this.destinations.reduce(function (prev, current) {
+            await this.sleep(10000);
+            // let whereTo = this.destinations.reduce(function (prev, current) {
+            //     if (prev.routed === true) return current;
+            //     return prev.distance_to_next <= current.distance_to_next
+            //         ? prev : current;
+            // });
+            let whereTo = this.destinations.reduce(function (prev, current,i) {
+                if (prev.routed === true) return current;
                 if (current.routed === true) return prev;
-                return current.distance_to_next < prev.distance_to_next
-                    ? current : prev;
+                console.log(i + " PREVIOUS:")
+                console.log(prev.location);
+                console.log(prev.distance_to_next);
+                console.log(i + " CURRENT:")
+                console.log(current.location);
+                console.log(current.distance_to_next);
+                console.log("\n\n");
+                return prev.distance_to_next < current.distance_to_next ? prev : current;
+                // if (current.routed === true) return prev;
+                // return current.distance_to_next < prev.distance_to_next
+                //     ? current : prev;
             });
+            console.log("the smallest was" + whereTo.location);
 
             Vue.set(this, 'currentTo',whereTo);
             console.log("current to is " + this.currentTo.location);
             return whereTo;
+        },
+        resetDestinations: function () {
+            Vue.set(this,'routes',[]);
+            Vue.set(this,'currentFrom',this.start);
+            this.destinations.find(destination => { if ( destination.route === true ) { destination.routed = false; } })
         },
         loadDirections: async function (){
             await this.setDestinationCoordinates();
@@ -93,6 +129,7 @@ export default {
                 Vue.set(this,'currentFrom',whereTo);
                 console.log("we just added 'routed' to the data for " + whereTo.location);
 
+                await this.sleep(7000);
                 this.$forceUpdate();
             }
         },
@@ -101,6 +138,7 @@ export default {
                 let distance = await this.getDistance(this.currentFrom,destination);
 
                 Vue.set(this.destinations[i],'distance_to_next',distance);
+                Vue.set(this.destinations[i],'start_point',this.currentFrom);
 
             },this);
         },
