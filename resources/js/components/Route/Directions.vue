@@ -67,7 +67,7 @@ export default {
         nextDestination: async function() {
             await this.setStartCoordinates();
             await this.calculateClosestLocation();
-            await this.sleep(10000);
+            // await this.sleep(10000);
             // let whereTo = this.destinations.reduce(function (prev, current) {
             //     if (prev.routed === true) return current;
             //     return prev.distance_to_next <= current.distance_to_next
@@ -129,7 +129,7 @@ export default {
                 Vue.set(this,'currentFrom',whereTo);
                 console.log("we just added 'routed' to the data for " + whereTo.location);
 
-                await this.sleep(7000);
+               // await this.sleep(7000);
                 this.$forceUpdate();
             }
         },

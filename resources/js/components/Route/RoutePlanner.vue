@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <div class="col-4"><h1>Route Planner</h1></div>
-        <div class="col-3 mb-2">
+        <div><h1>Route Planner</h1></div>
+        <div>
             <input id="StartingPoint" type="text" class="form-control mb-1" aria-describedby="startPostcode" v-model="start" placeholder="Starting Postcode"/>
             <button class="btn btn-primary" @click="setPosition">Set starting point</button>
             <div id="startPostcode" class="form-text">
@@ -9,7 +9,7 @@
             </div>
 
         </div>
-        <div class="col-3">
+        <div>
             <div class="row my-3">
                 <label for="destinationsList" class="form-label">Destination Postcodes</label>
                 <div class="col align-content-center" id="destinationsList">
@@ -25,12 +25,12 @@
             </div>
         </div>
         <div class="row mb-1">
-            <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i" class="row col-6">
-                <div class="col-8 pt-1">
+            <div v-for="(destination, i, n ) in destinations" :key="'destination-'+i">
+                <div>
                     <label for="tripDestination" class="form-label">Destination {{ n }}</label>
                     <input id="tripDestination" class="form-control" type="text" v-model="destination.location"/>
                 </div>
-                <div class="col-4 mt-auto">
+                <div>
                     <button v-show="destinations.length > 1" @click="removeInput(i)" type="button" class="btn btn-outline-secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
