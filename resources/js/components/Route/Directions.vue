@@ -1,6 +1,7 @@
 <template>
     <div class="row">
         <div v-for="destination in the_destinations">
+            <div v-if="destination.location">
             <div class="card-header">Route Directions</div>
             <div class="card-body" v-if="destination.location">
                 <div class="form-label">
@@ -19,6 +20,7 @@
                     </p>
                 </div>
                 <pre>{{ destination.route || 'Preparing to fetch route information...\nClick Route to complete.' }}</pre>
+            </div>
             </div>
         </div>
     </div>
@@ -95,9 +97,22 @@ export default {
             return whereTo;
         },
         resetDestinations: function () {
-            Vue.set(this,'routes',[]);
+            this.clearRoutes();
+            this.clearRoutedDestinations();
             Vue.set(this,'currentFrom',this.start);
-            this.destinations.find(destination => { if ( destination.route === true ) { destination.routed = false; } })
+            Vue.set(this,'currentTo','');
+            Vue.set(this,'destinations',this.initial_destinations);
+        },
+        clearRoutes: function () {
+            this.routes.map(function (route, i) {
+               Vue.set(this.routes[i],'route','');
+               Vue.set(this.routes[i],'location','');
+            },this);
+        },
+        clearRoutedDestinations: function () {
+            this.destinations.map(function (destination, i){
+                Vue.set(destination,'routed',false);
+            });
         },
         loadDirections: async function (){
             await this.setDestinationCoordinates();
@@ -129,7 +144,7 @@ export default {
                 Vue.set(this,'currentFrom',whereTo);
                 console.log("we just added 'routed' to the data for " + whereTo.location);
 
-               // await this.sleep(7000);
+                // await this.sleep(7000);
                 this.$forceUpdate();
             }
         },

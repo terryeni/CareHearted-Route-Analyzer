@@ -40,8 +40,11 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" @click="loadDestinations">
+        <button type="submit" class="btn btn-primary" @click="loadDestinations" :disabled="!showPlotRoute">
             Plot Route
+        </button>
+        <button type="submit" class="btn btn-primary" @click="reset" v-if="!showPlotRoute" :disabled="showPlotRoute">
+            Recalculate
         </button>
 
         <div class="card mt-3" v-if="destinations[0].location">
@@ -77,6 +80,7 @@ export default {
             destination1: '',
             destination2: '',
             destinations: [{location:''}],
+            showPlotRoute: true
         }
     },
     mounted(){
@@ -160,7 +164,15 @@ export default {
             return cord;
         },
         loadDestinations: function (){
+            this.showPlotRoute = false;
             this.$refs.directions.loadDirections();
+        },
+        reset: function () {
+            if (this.showPlotRoute === false) {
+                this.showPlotRoute = true;
+                this.$refs.directions.resetDestinations();
+                this.loadDestinations();
+            }
         },
         addInput: function () {
             this.destinations.push({location:''});
