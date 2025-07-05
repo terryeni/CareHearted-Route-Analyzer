@@ -3,12 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { routeOptimizer } from '@/lib/route-optimizer'
 import { aiAnalyzer } from '@/lib/ai-analyzer'
 import { InsertRoute, InsertTeamAssignment } from '@/lib/database.types'
+import { isDemoMode, DEMO_JOBS, DEMO_AI_RESPONSES } from '@/lib/demo-data'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient()
     const body = await request.json()
-
     const { jobId, origin = 'London, UK' } = body
 
     if (!jobId) {
@@ -18,19 +17,87 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Fetch job details
-    const { data: job, error: jobError } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('id', jobId)
-      .single()
+    let job
+    if (isDemoMode()) {
+      // Find job in demo data
+      job = DEMO_JOBS.find(j => j.id === jobId)
+      if (!job) {
+        return NextResponse.json(
+          { error: 'Job not found' },
+          { status: 404 }
+        )
+      }
+    } else {
+      // Fetch job from database
+      const supabase = createServerSupabaseClient()
+      const { data: jobData, error: jobError } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('id', jobId)
+        .single()
 
-    if (jobError || !job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      )
+      if (jobError || !jobData) {
+        return NextResponse.json(
+          { error: 'Job not found' },
+          { status: 404 }
+        )
+      }
+      job = jobData
     }
+
+    if (isDemoMode()) {
+      // Demo mode - return mock optimized route
+      const mockOptimizedRoute = {
+        order: job.postcodes,
+        totalDistance: 15420,
+        totalTime: 8700,
+        waypoints: job.postcodes.map((pc: string) => ({ postcode: pc })),
+        routeData: {
+          routes: [{
+            legs: job.postcodes.map(() => ({ 
+              distance: { value: 5000 }, 
+              duration: { value: 1800 } 
+            }))
+          }]
+        }
+      }
+
+      const mockTeamRecommendation = {
+        teamSize: job.job_type === 'delivery_only' ? 1 : 2,
+        estimatedDays: 1,
+        recommendation: job.job_type === 'delivery_only' ? 'Driver only' : 'Installer + Assistant'
+      }
+
+      return NextResponse.json({
+        route: {
+          id: `demo-route-${Date.now()}`,
+          job_id: jobId,
+          optimized_order: mockOptimizedRoute.order,
+          total_distance: mockOptimizedRoute.totalDistance,
+          total_time: mockOptimizedRoute.totalTime,
+          route_data: mockOptimizedRoute.routeData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        teamAssignment: {
+          id: `demo-assignment-${Date.now()}`,
+          job_id: jobId,
+          assigned_to: [],
+          team_size: mockTeamRecommendation.teamSize,
+          estimated_days: mockTeamRecommendation.estimatedDays,
+          assignment_date: job.preferred_date_start || new Date().toISOString().split('T')[0],
+          notes: mockTeamRecommendation.recommendation,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        teamRecommendation: mockTeamRecommendation,
+        aiAnalysis: DEMO_AI_RESPONSES.risk_analysis,
+        optimizedRoute: mockOptimizedRoute
+      })
+    }
+
+    // Real mode - use actual services
+    const supabase = createServerSupabaseClient()
 
     // Optimize the route
     const optimizedRoute = await routeOptimizer.optimizeRoute(

@@ -6,6 +6,8 @@ import { useToast } from '@/components/ui/toaster'
 import { JobForm } from './job-form'
 import { JobList } from './job-list'
 import { RouteMap } from './route-map'
+import { DemoMap } from './demo-map'
+import { isDemoMode } from '@/lib/demo-data'
 import { Job } from '@/lib/database.types'
 import { 
   PlusIcon, 
@@ -80,6 +82,15 @@ export function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
+        {isDemoMode() && (
+          <div className="bg-blue-600 text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+              <p className="text-center text-sm">
+                🎮 <strong>Demo Mode</strong> - You&apos;re viewing a demonstration with sample data. No external APIs required!
+              </p>
+            </div>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
@@ -89,6 +100,11 @@ export function Dashboard() {
               <span className="text-sm text-gray-500">
                 Workforce Management System
               </span>
+              {isDemoMode() && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  Demo
+                </span>
+              )}
             </div>
             
             <div className="flex items-center space-x-4">
@@ -174,11 +190,21 @@ export function Dashboard() {
         )}
         
         {activeTab === 'map' && (
-          <RouteMap
-            selectedJob={selectedJob}
-            jobs={jobs}
-            onJobSelect={setSelectedJob}
-          />
+          <>
+            {isDemoMode() ? (
+              <DemoMap
+                selectedJob={selectedJob}
+                jobs={jobs}
+                onJobSelect={setSelectedJob}
+              />
+            ) : (
+              <RouteMap
+                selectedJob={selectedJob}
+                jobs={jobs}
+                onJobSelect={setSelectedJob}
+              />
+            )}
+          </>
         )}
       </main>
     </div>

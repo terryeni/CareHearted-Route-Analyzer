@@ -2,9 +2,23 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import { NextRequest, NextResponse } from 'next/server'
 import { InsertJob, UpdateJob } from '@/lib/database.types'
 import { generateJobId, validatePostcode, normalizePostcode } from '@/lib/utils'
+import { isDemoMode, DEMO_JOBS } from '@/lib/demo-data'
 
 export async function GET(request: NextRequest) {
   try {
+    if (isDemoMode()) {
+      // Return demo data in demo mode
+      const { searchParams } = new URL(request.url)
+      const status = searchParams.get('status')
+      
+      let filteredJobs = DEMO_JOBS
+      if (status) {
+        filteredJobs = DEMO_JOBS.filter(job => job.status === status)
+      }
+      
+      return NextResponse.json(filteredJobs)
+    }
+    
     const supabase = createServerSupabaseClient()
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -46,7 +60,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient()
     const body = await request.json()
 
     // Validate required fields
@@ -61,7 +74,7 @@ export async function POST(request: NextRequest) {
       created_by
     } = body
 
-    if (!client_name || !job_type || !postcodes || !vehicle_size || !created_by) {
+    if (!client_name || !job_type || !postcodes || !vehicle_size) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -89,10 +102,22 @@ export async function POST(request: NextRequest) {
       notes,
       preferred_date_start,
       preferred_date_end,
-      created_by,
+      created_by: created_by || 'demo-user-123',
       status: 'pending'
     }
 
+    if (isDemoMode()) {
+      // In demo mode, simulate successful creation
+      const newJob = {
+        id: `demo-job-${Date.now()}`,
+        ...jobData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      return NextResponse.json(newJob, { status: 201 })
+    }
+
+    const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
       .from('jobs')
       .insert(jobData)

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
+import { isDemoMode, DEMO_USER } from '@/lib/demo-data'
 
 interface AuthContextType {
   user: User | null
@@ -31,6 +32,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (isDemoMode()) {
+      // Demo mode - auto login with demo user
+      setUser(DEMO_USER as unknown as User)
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -52,6 +60,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const signIn = async (email: string, password: string) => {
+    if (isDemoMode()) {
+      // Demo mode - simulate successful login
+      setUser(DEMO_USER as unknown as User)
+      return
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -60,6 +74,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    if (isDemoMode()) {
+      // Demo mode - simulate successful signup
+      setUser(DEMO_USER as unknown as User)
+      return
+    }
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -73,6 +93,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const signOut = async () => {
+    if (isDemoMode()) {
+      // Demo mode - simulate successful logout
+      setUser(null)
+      return
+    }
+    
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
